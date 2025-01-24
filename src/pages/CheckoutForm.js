@@ -46,7 +46,7 @@ const InputField = React.memo(({
 });
 
 const CheckoutForm = () => {
-  const { cartItems } = useAppContext();
+  const { cartItems,emptyCart } = useAppContext();
   const navigate = useNavigate();
   
   const total = useMemo(() => 
@@ -139,6 +139,7 @@ const CheckoutForm = () => {
       handler: function (response) {
         alert("Your Payment was successful!");
         console.log("Payment successful: ", response);
+        emptyCart();
         navigate('/');
       },
       prefill: {

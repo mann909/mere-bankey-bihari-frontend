@@ -21,6 +21,10 @@ export const AppProvider = ({ children }) => {
         sessionStorage.setItem('existingCartItems', JSON.stringify(cartItems));
     }, [cartItems]);
 
+    const emptyCart = () => {
+        setCartItems([]);
+    }
+
     const alreadyExistsInCart = (id) => {
         return cartItems.find(item => item.id === id);
     };
@@ -73,6 +77,7 @@ export const AppProvider = ({ children }) => {
         alreadyExistsInCart,
         addToCart,
         removeFromCart,
+        emptyCart,
     };
 
     return (

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 // Create the context
 const AppContext = createContext();
@@ -34,11 +35,13 @@ export const AppProvider = ({ children }) => {
         if (existing) {
             updateQuantity(product.id, 1);
         } else {
+            toast.success('Product added to cart');
             setCartItems([...cartItems, { ...product, quantity: 1 }]);
         }
     };
 
     const removeFromCart = (id) => {
+        toast.error('Product removed from cart');
         setCartItems(cartItems.filter(item => item.id !== id));
     }
 

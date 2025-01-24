@@ -4,6 +4,7 @@ import { X, ArrowRight, ArrowLeft, Check, MapPin, Phone, Mail, User } from 'luci
 import axios from 'axios';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const InputField = React.memo(({ 
   icon: Icon, 
@@ -137,7 +138,7 @@ const CheckoutForm = () => {
       description: "Payment for Bankey Bihari",
       order_id: orderData.id,
       handler: function (response) {
-        alert("Your Payment was successful!");
+        toast.success("Your Payment was successful!");
         console.log("Payment successful: ", response);
         emptyCart();
         navigate('/');

@@ -1,10 +1,14 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, ArrowLeft, Check, MapPin, Phone, Mail, User } from 'lucide-react';
 import axios from 'axios';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
+const BACKEND_URL = 'https://mere-bankey-bihari-backend-production-41f5.up.railway.app'
+// const BACKEND_URL = 'http://localhost:8181';
+// const BACKEND_URL = 'http://192.168.1.14:8181';
 
 const InputField = React.memo(({ 
   icon: Icon, 
@@ -56,7 +60,7 @@ const CheckoutForm = () => {
   );
 
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState( JSON.parse(sessionStorage.getItem('CheckoutForm')) || {
     firstName: '',
     lastName: '',
     email: '',
@@ -66,6 +70,11 @@ const CheckoutForm = () => {
     state: '',
     pincode: ''
   });
+
+  useEffect(()=>{
+    sessionStorage.setItem('CheckoutForm',JSON.stringify(formData));
+  },[formData])
+
   const [errors, setErrors] = useState({});
 
   const handleChange = useCallback((e) => {
@@ -122,7 +131,19 @@ const CheckoutForm = () => {
 
   const createOrder = useCallback(async () => {
     try { 
-      const { data } = await axios.post("https://mere-bankey-bihari-backend-production-41f5.up.railway.app/capture-payment");
+      console.log("Form data while creating order : ",formData)
+      const { data } = await axios.post(`${BACKEND_URL}/capture-payment`,{
+        data:{
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          phone: formData.phone,
+          address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+          items:cartItems,
+          totalPrice:total,
+          pincode:formData.pincode,
+        }
+      });
+      console.log("Order created:", data);
       loadRazorpay(data);
     } catch (error) {
       console.error("Error creating Razorpay order:", error);
@@ -130,13 +151,13 @@ const CheckoutForm = () => {
   }, []);
   const loadRazorpay = useCallback((orderData) => {
     const options = {
-      key: process.env.REACT_APP_RAZORPAY_TEST_KEY,
+      key: "rzp_test_KUXOjV1aFD32MX",
       amount: orderData.amount,
       currency: orderData.currency,
       name: "Bankey Bihari",
       image:"./images/logo.png",
       description: "Payment for Bankey Bihari",
-      order_id: orderData.id,
+      order_id: orderData._id,
       handler: function (response) {
         toast.success("Your Payment was successful!");
         console.log("Payment successful: ", response);
@@ -150,9 +171,9 @@ const CheckoutForm = () => {
       },
       notes: {
         address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
-        userId: "678b3e865edf34bfee3d382c",
-        productId: "678b3e5155b4a781f1b0911c",
-        productType: "Material",
+        items:cartItems,
+        totalPrice:total,
+        pincode:formData.pincode,
       },
       theme: {
         color: "#F37254"
@@ -323,7 +344,7 @@ const CheckoutForm = () => {
                   <h3 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">Order Summary</h3>
                   <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
                     {cartItems?.map(item => (
-                      <div key={item.id} className="flex justify-between">
+                      <div key={item._id} className="flex justify-between">
                         <span>{item.name} x {item.quantity}</span>
                         <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                       </div>

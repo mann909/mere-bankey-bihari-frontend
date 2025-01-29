@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(Boolean(sessionStorage.getItem('isAdminLoggedIn'))||false);
 
     const [cartItems, setCartItems] = useState(() => {
         const saved = sessionStorage.getItem('existingCartItems');
@@ -27,13 +28,13 @@ export const AppProvider = ({ children }) => {
     }
 
     const alreadyExistsInCart = (id) => {
-        return cartItems.find(item => item.id === id);
+        return cartItems.find(item => item._id === id);
     };
 
     const addToCart = (product) => {
-        const existing = cartItems.find(item => item.id === product.id);
+        const existing = cartItems.find(item => item._id === product._id);
         if (existing) {
-            updateQuantity(product.id, 1);
+            updateQuantity(product._id, 1);
         } else {
             toast.success('Product added to cart');
             setCartItems([...cartItems, { ...product, quantity: 1 }]);
@@ -42,12 +43,12 @@ export const AppProvider = ({ children }) => {
 
     const removeFromCart = (id) => {
         toast.error('Product removed from cart');
-        setCartItems(cartItems.filter(item => item.id !== id));
+        setCartItems(cartItems.filter(item => item._id !== id));
     }
 
     const updateQuantity = (id, change) => {
         setCartItems(cartItems.map(item => {
-          if (item.id === id) {
+          if (item._id === id) {
             const newQuantity = Math.max(0, item.quantity + change);
             return { ...item, quantity: newQuantity };
           }
@@ -73,6 +74,8 @@ export const AppProvider = ({ children }) => {
         loading,
         cartItems,
         totalAmount,
+        isAdminLoggedIn,
+        setIsAdminLoggedIn,
         setLoading,
         login,
         logout,

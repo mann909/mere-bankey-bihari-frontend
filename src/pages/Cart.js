@@ -8,6 +8,7 @@ const Cart = () => {
   const [isOpen, setIsOpen] = useState(false);
   const {cartItems,updateQuantity} = useAppContext();
   const navigate = useNavigate();
+  console.log(cartItems);
 
   // const [items, setItems] = useState(cartItems);
 
@@ -122,7 +123,7 @@ const Cart = () => {
               <AnimatePresence>
                 {cartItems.map(item => (
                   <motion.div
-                    key={item.id}
+                    key={item._id}
                     variants={itemVariants}
                     initial="hidden"
                     animate="visible"
@@ -136,12 +137,12 @@ const Cart = () => {
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-gray-800 text-sm sm:text-base truncate">{item.name}</h3>
-                      <p className="text-orange-500 font-semibold text-sm sm:text-base">{item.price}</p>
+                      <p className="text-orange-500 font-semibold text-sm sm:text-base">₹{item.price}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => updateQuantity(item.id, -1)}
+                          onClick={() => updateQuantity(item._id, -1)}
                           className="p-1 rounded-full bg-orange-50 text-orange-500"
                         >
                           <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -150,15 +151,16 @@ const Cart = () => {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="p-1 rounded-full bg-orange-50 text-orange-500"
+                          onClick={() => updateQuantity(item._id, 1)}
+                          className={item.quantity>=item.stock ? " bg-gray-100 text-gray-400 cursor-not-allowed":"p-1 rounded-full bg-orange-50 text-orange-500"}
+                          disabled={item.quantity >= item.stock}
                         >
                           <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => updateQuantity(item.id, -item.quantity)}
+                          onClick={() => updateQuantity(item._id, -item.quantity)}
                           className="ml-auto p-1 rounded-full hover:bg-gray-100"
                         >
                           <Trash2 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Lock, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,10 @@ const LoginPage = () => {
     if(email === "admin@gmail.com" && password === "admin"){
         setIsAdminLoggedIn(true);
         sessionStorage.setItem("isAdminLoggedIn", true);
+        toast.success("Login successful");
         navigate("/admin@mere-bankey-bihari");
+    }else{
+      toast.error("Invalid email or password");
     }
   };
 

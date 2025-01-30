@@ -60,6 +60,8 @@ const CheckoutForm = () => {
   );
 
   const [step, setStep] = useState(1);
+
+  console.log("Session storage : ",JSON.parse(sessionStorage.getItem('CheckoutForm')))
   const [formData, setFormData] = useState( JSON.parse(sessionStorage.getItem('CheckoutForm')) || {
     firstName: '',
     lastName: '',
@@ -70,6 +72,7 @@ const CheckoutForm = () => {
     state: '',
     pincode: ''
   });
+  console.log("form data initially : ",formData)
 
   useEffect(()=>{
     sessionStorage.setItem('CheckoutForm',JSON.stringify(formData));
@@ -131,16 +134,17 @@ const CheckoutForm = () => {
 
   const createOrder = useCallback(async () => {
     try { 
-      console.log("Form data while creating order : ",formData)
+      let finalFormData = JSON.parse(sessionStorage.getItem('CheckoutForm'))
+      console.log("Form data while creating order : ",finalFormData)
       const { data } = await axios.post(`${BACKEND_URL}/capture-payment`,{
         data:{
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          phone: formData.phone,
-          address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+          name: `${finalFormData.firstName} ${finalFormData.lastName}`,
+          email: finalFormData.email,
+          phone: finalFormData.phone,
+          address: `${finalFormData.address}, ${finalFormData.city}, ${finalFormData.state} - ${finalFormData.pincode}`,
           items:cartItems,
           totalPrice:total,
-          pincode:formData.pincode,
+          pincode:finalFormData.pincode,
         }
       });
       console.log("Order created:", data);
@@ -165,9 +169,9 @@ const CheckoutForm = () => {
         navigate('/');
       },
       prefill: {
-        name: `${formData.firstName} ${formData.lastName}`,
-        email: formData.email,
-        contact: formData.phone
+        name: `Dummy Name`,
+        email: "dummy email",
+        contact: "dummy phone"
       },
       notes: {
         address: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
